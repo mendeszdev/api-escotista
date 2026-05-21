@@ -317,13 +317,3 @@ git push -u origin main
 
 > ✅ O `.gitignore` já garante que `.env` nunca seja enviado.
 > ✅ O `.env.example` vai junto como guia para outros devs.
-
----
-
-## 🔒 Segurança para produção
-
-- Nunca commite `.env` no Git
-- Use `System.getenv("DB_PASS")` se hospedar em servidor com variáveis de sistema
-- Implemente autenticação JWT para proteger os endpoints
-- Restrinja `Access-Control-Allow-Origin` ao domínio do frontend
-- Considere BCrypt para hash de senhas (`org.mindrot:jbcrypt:0.4`)
