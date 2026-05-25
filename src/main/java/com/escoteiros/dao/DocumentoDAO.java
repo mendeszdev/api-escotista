@@ -4,6 +4,7 @@ import com.escoteiros.config.DatabaseConfig;
 import com.escoteiros.model.Documento;
 
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 public class DocumentoDAO {
