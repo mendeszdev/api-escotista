@@ -22,11 +22,11 @@ public class DatabaseConfig {
         .ignoreIfMissing()     // não quebra a aplicação se .env não existir
         .load();
 
-    private static final String HOST     = dotenv.get("DB_HOST",     "localhost");
-    private static final String PORT     = dotenv.get("DB_PORT",     "5432");
-    private static final String DATABASE = dotenv.get("DB_NAME",     "postgres");
-    private static final String USER     = dotenv.get("DB_USER",     "postgres");
-    private static final String PASSWORD = dotenv.get("DB_PASS",     "");
+    private static final String HOST     = System.getProperty("DB_HOST",     dotenv.get("DB_HOST",     "localhost"));
+    private static final String PORT     = System.getProperty("DB_PORT",     dotenv.get("DB_PORT",     "5432"));
+    private static final String DATABASE = System.getProperty("DB_NAME",     dotenv.get("DB_NAME",     "postgres"));
+    private static final String USER     = System.getProperty("DB_USER",     dotenv.get("DB_USER",     "postgres"));
+    private static final String PASSWORD = System.getProperty("DB_PASS",     dotenv.get("DB_PASS",     ""));
 
     private static final String URL = String.format(
         "jdbc:postgresql://%s:%s/%s?sslmode=require", HOST, PORT, DATABASE

@@ -68,6 +68,28 @@ public class AssociadoDAO {
         return null;
     }
 
+    public Associado autenticar(String matricula, String senha) throws SQLException {
+        String sql = """
+        SELECT id, grupo_escoteiro_id, matricula, senha_hash, perfil,
+               nome_completo, nome_escoteiro, data_nascimento, genero, estado_civil,
+               cpf, rg, passaporte, email, telefone, cep, logradouro, numero_end,
+               bairro, cidade, estado, foto_url, status, documentos_validados,
+               criado_em, atualizado_em
+        FROM associados WHERE matricula = ? AND status = 'ativo'
+        """;
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, matricula);
+            ResultSet rs = st.executeQuery();
+            if (!rs.next()) return null;
+            String senhaHashSalva = rs.getString("senha_hash");
+            if (!senha.equals(senhaHashSalva)) return null;
+            Associado a = mapear(rs);
+            a.setSenhaHash(null);
+            return a;
+        }
+    }
+
     // ── INSERIR ─────────────────────────────────────────────────────────────
     public Associado inserir(Associado a) throws SQLException {
         String sql = """
