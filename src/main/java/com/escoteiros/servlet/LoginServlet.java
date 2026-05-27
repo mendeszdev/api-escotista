@@ -3,6 +3,7 @@ package com.escoteiros.servlet;
 import com.escoteiros.dao.AssociadoDAO;
 import com.escoteiros.model.Associado;
 import com.escoteiros.util.BaseServlet;
+import com.escoteiros.util.TokenStore;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -73,9 +74,8 @@ public class LoginServlet extends BaseServlet {
                 return;
             }
 
-            // 3. Gerar token simples (UUID)
-            // TODO: Substituir por JWT para produção
-            String token = UUID.randomUUID().toString();
+            // 3. Gerar token e registrar com expiração de 8 h
+            String token = TokenStore.register(UUID.randomUUID().toString());
 
             // 4. Montar objeto de usuário para o frontend
             // Campo `perfil` do banco → `role` esperado pelo frontend
