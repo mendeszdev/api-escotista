@@ -1,9 +1,12 @@
 -- ============================================================
 -- SEED: Usuários de Teste
--- Execute uma vez no banco Supabase (PostgreSQL).
--- Usa ON CONFLICT DO NOTHING para ser idempotente.
--- ATENÇÃO: senhas em texto puro — adequado apenas para DEV.
+-- Execute no SQL Editor do Supabase.
+-- Usa pgcrypto (disponível por padrão no Supabase) para gerar
+-- hashes BCrypt compatíveis com jBCrypt na API Java.
+-- Idempotente: re-executar atualiza as senhas existentes.
 -- ============================================================
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 1. Grupo Escoteiro de referência ─────────────────────────
 INSERT INTO grupos_escoteiros (id, nome, numero, distrito, regiao, status)
@@ -18,7 +21,7 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 
 -- 2. Usuário LOBINHO ────────────────────────────────────────
---    Acesso: matrícula = LB.2024-001 / senha = Lobinho@123
+--    Login: LB.2024-001 / Lobinho@123
 INSERT INTO associados (
     id, grupo_escoteiro_id, matricula, senha_hash, perfil,
     nome_completo, nome_escoteiro,
@@ -31,7 +34,7 @@ INSERT INTO associados (
     'f1e2d3c4-b5a6-7890-abcd-1234567890ab',
     'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     'LB.2024-001',
-    'Lobinho@123',
+    crypt('Lobinho@123', gen_salt('bf', 12)),
     'lobinho',
     'Pedro Henrique Santos Oliveira',
     'Falcão Veloz',
@@ -41,10 +44,11 @@ INSERT INTO associados (
     '01310-100', 'Avenida Paulista', '1000', 'Bela Vista', 'São Paulo', 'SP',
     'ativo', false
 )
-ON CONFLICT (matricula) DO NOTHING;
+ON CONFLICT (matricula) DO UPDATE
+    SET senha_hash = crypt('Lobinho@123', gen_salt('bf', 12));
 
 -- 3. Usuário ESCOTISTA ──────────────────────────────────────
---    Acesso: matrícula = ES.2024-001 / senha = Escotista@123
+--    Login: ES.2024-001 / Escotista@123
 INSERT INTO associados (
     id, grupo_escoteiro_id, matricula, senha_hash, perfil,
     nome_completo, nome_escoteiro,
@@ -57,7 +61,7 @@ INSERT INTO associados (
     'c2d3e4f5-a6b7-8901-cdef-234567890abc',
     'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     'ES.2024-001',
-    'Escotista@123',
+    crypt('Escotista@123', gen_salt('bf', 12)),
     'escotista',
     'Ana Carolina Ferreira Lima',
     'Águia Dourada',
@@ -67,10 +71,11 @@ INSERT INTO associados (
     '04538-133', 'Rua Funchal', '418', 'Vila Olímpia', 'São Paulo', 'SP',
     'ativo', true
 )
-ON CONFLICT (matricula) DO NOTHING;
+ON CONFLICT (matricula) DO UPDATE
+    SET senha_hash = crypt('Escotista@123', gen_salt('bf', 12));
 
 -- 4. Usuário DIRIGENTE ──────────────────────────────────────
---    Acesso: matrícula = DG.2024-001 / senha = Dirigente@123
+--    Login: DG.2024-001 / Dirigente@123
 INSERT INTO associados (
     id, grupo_escoteiro_id, matricula, senha_hash, perfil,
     nome_completo, nome_escoteiro,
@@ -83,7 +88,7 @@ INSERT INTO associados (
     'd3e4f5a6-b7c8-9012-def0-34567890abcd',
     'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     'DG.2024-001',
-    'Dirigente@123',
+    crypt('Dirigente@123', gen_salt('bf', 12)),
     'dirigente',
     'Carlos Eduardo Mendes Costa',
     'Leão do Norte',
@@ -93,10 +98,13 @@ INSERT INTO associados (
     '01414-000', 'Alameda Santos', '200', 'Cerqueira César', 'São Paulo', 'SP',
     'ativo', true
 )
-ON CONFLICT (matricula) DO NOTHING;
+ON CONFLICT (matricula) DO UPDATE
+    SET senha_hash = crypt('Dirigente@123', gen_salt('bf', 12));
 
 -- ============================================================
--- Verificação rápida após executar:
--- SELECT matricula, perfil, nome_completo, status FROM associados
--- WHERE matricula IN ('LB.2024-001','ES.2024-001','DG.2024-001');
+-- Verificação: confirmar que as senhas foram hasheadas
+-- SELECT matricula, perfil,
+--        left(senha_hash, 7) AS prefixo_hash  -- deve mostrar '$2a$12$'
+-- FROM associados
+-- WHERE matricula IN ('LB.2024-001', 'ES.2024-001', 'DG.2024-001');
 -- ============================================================

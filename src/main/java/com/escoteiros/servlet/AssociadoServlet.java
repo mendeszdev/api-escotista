@@ -3,6 +3,7 @@ package com.escoteiros.servlet;
 import com.escoteiros.dao.AssociadoDAO;
 import com.escoteiros.model.Associado;
 import com.escoteiros.util.BaseServlet;
+import com.escoteiros.util.PasswordUtil;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -58,8 +59,9 @@ public class AssociadoServlet extends BaseServlet {
         jsonResponse(res);
         try {
             Associado a = gson.fromJson(lerBody(req), Associado.class);
-            // ATENÇÃO: Em produção, aplique BCrypt na senha antes de persistir
-            // a.setSenhaHash(BCrypt.hashpw(senhaRaw, BCrypt.gensalt()));
+            if (a.getSenhaHash() != null && !a.getSenhaHash().isBlank()) {
+                a.setSenhaHash(PasswordUtil.hash(a.getSenhaHash()));
+            }
             Associado criado = dao.inserir(a);
             res.setStatus(201);
             res.getWriter().print(gson.toJson(criado));
