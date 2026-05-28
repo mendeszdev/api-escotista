@@ -1,52 +1,39 @@
 package com.escoteiros.servlet;
 
+import com.escoteiros.config.JwtConfig;
 import com.escoteiros.dao.AssociadoDAO;
 import com.escoteiros.model.Associado;
 import com.escoteiros.util.BaseServlet;
-import com.escoteiros.util.TokenStore;
+import com.escoteiros.util.JwtUtil;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
- * Endpoint de autenticação.
- *
  * POST /api/auth/login
  * Body: { "matricula": "123.456-7", "senha": "minhasenha" }
  *
  * Resposta de sucesso:
  * {
- *   "success": true,
- *   "token": "<uuid>",
- *   "user": {
- *     "id": "<uuid>",
- *     "name": "Nome Completo",
- *     "nomeEscoteiro": "Nome Escoteiro",
- *     "matricula": "123.456-7",
- *     "role": "lobinho",        ← mapeado do campo `perfil`
- *     "email": "...",
- *     "fotoUrl": "..."
- *   }
+ *   "success":      true,
+ *   "accessToken":  "<jwt — expira em ACCESS_EXPIRY_MINUTES>",
+ *   "refreshToken": "<jwt — expira em REFRESH_EXPIRY_DAYS>",
+ *   "expiresIn":    1800,
+ *   "user": { id, name, nomeEscoteiro, matricula, role, email, fotoUrl, grupoId }
  * }
- *
- * ATENÇÃO: O token gerado aqui é apenas um UUID simples (sem expiração).
- * Em produção, substitua por JWT com biblioteca como `java-jwt` ou `jjwt`.
  */
 @WebServlet("/api/auth/login")
 public class LoginServlet extends BaseServlet {
 
-    private final AssociadoDAO dao = new AssociadoDAO();
+    private final AssociadoDAO associadoDAO = new AssociadoDAO();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         jsonResponse(res);
-
         try {
-            // 1. Ler body da requisição
             Map<?, ?> body = gson.fromJson(lerBody(req), Map.class);
             if (body == null) {
                 erro(res, 400, "Body inválido");
@@ -62,9 +49,7 @@ public class LoginServlet extends BaseServlet {
                 return;
             }
 
-            // 2. Buscar associado pela matrícula + validar senha
-            Associado associado = dao.autenticar(matricula, senha);
-
+            Associado associado = associadoDAO.autenticar(matricula, senha);
             if (associado == null) {
                 res.setStatus(401);
                 res.getWriter().print(gson.toJson(Map.of(
@@ -74,27 +59,29 @@ public class LoginServlet extends BaseServlet {
                 return;
             }
 
-            // 3. Gerar token e registrar com expiração de 8 h
-            String token = TokenStore.register(UUID.randomUUID().toString());
+            String role         = mapearPerfil(associado.getPerfil());
+            String accessToken  = JwtUtil.gerarAccessToken(
+                associado.getId(), associado.getMatricula(), role,
+                associado.getNomeCompleto(), associado.getGrupoEscotelroId());
+            String refreshToken = JwtUtil.gerarRefreshToken(associado.getId());
 
-            // 4. Montar objeto de usuário para o frontend
-            // Campo `perfil` do banco → `role` esperado pelo frontend
             Map<String, Object> user = new HashMap<>();
             user.put("id",           associado.getId().toString());
             user.put("name",         associado.getNomeCompleto());
             user.put("nomeEscoteiro",associado.getNomeEscoteiro());
             user.put("matricula",    associado.getMatricula());
-            user.put("role",         mapearPerfil(associado.getPerfil())); // perfil_tipo → role
+            user.put("role",         role);
             user.put("email",        associado.getEmail());
             user.put("fotoUrl",      associado.getFotoUrl());
             user.put("grupoId",      associado.getGrupoEscotelroId() != null
                                         ? associado.getGrupoEscotelroId().toString() : null);
 
-            // 5. Retornar resposta
             Map<String, Object> resposta = new HashMap<>();
-            resposta.put("success", true);
-            resposta.put("token",   token);
-            resposta.put("user",    user);
+            resposta.put("success",      true);
+            resposta.put("accessToken",  accessToken);
+            resposta.put("refreshToken", refreshToken);
+            resposta.put("expiresIn",    JwtConfig.ACCESS_EXPIRY_MINUTES * 60);
+            resposta.put("user",         user);
 
             res.getWriter().print(gson.toJson(resposta));
 
@@ -103,17 +90,6 @@ public class LoginServlet extends BaseServlet {
         }
     }
 
-    /**
-     * Mapeia o enum `perfil_tipo` do banco para o `role` esperado pelo frontend.
-     * Ajuste os valores conforme os enums cadastrados no PostgreSQL.
-     *
-     * Valores comuns no banco   →  role no frontend
-     * "lobinho"                 →  "lobinho"
-     * "escotista"               →  "escotista"
-     * "dirigente"               →  "dirigente"
-     * "senior"                  →  "escotista"  (fallback)
-     * "pioneiro"                →  "escotista"  (fallback)
-     */
     private String mapearPerfil(String perfil) {
         if (perfil == null) return "lobinho";
         return switch (perfil.toLowerCase()) {
