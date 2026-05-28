@@ -2,6 +2,7 @@ package com.escoteiros.dao;
 
 import com.escoteiros.config.DatabaseConfig;
 import com.escoteiros.model.Associado;
+import com.escoteiros.util.PasswordUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -83,7 +84,7 @@ public class AssociadoDAO {
             ResultSet rs = st.executeQuery();
             if (!rs.next()) return null;
             String senhaHashSalva = rs.getString("senha_hash");
-            if (!senha.equals(senhaHashSalva)) return null;
+            if (!PasswordUtil.verificar(senha, senhaHashSalva)) return null;
             Associado a = mapear(rs);
             a.setSenhaHash(null);
             return a;

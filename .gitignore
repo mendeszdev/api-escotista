@@ -2,6 +2,7 @@
 # SEGURANÇA — variáveis de ambiente com credenciais
 # ─────────────────────────────────────────────────────────────
 .env
+src/main/resources/.env
 
 # ─────────────────────────────────────────────────────────────
 # MAVEN — arquivos gerados pelo build
