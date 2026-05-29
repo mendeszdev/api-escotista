@@ -52,7 +52,7 @@ public class AlcateiaDAO {
             """;
         try (Connection con = DatabaseConfig.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
-            st.setObject(1, a.getGrupoEscotelroId());
+            st.setObject(1, a.getGrupoEscoteiroId());
             st.setString(2, a.getNome());
             st.setString(3, a.getDescricao());
             st.setString(4, a.getStatus() != null ? a.getStatus() : "ativo");
@@ -90,7 +90,7 @@ public class AlcateiaDAO {
     private Alcateia mapear(ResultSet rs) throws SQLException {
         Alcateia a = new Alcateia();
         a.setId((UUID) rs.getObject("id"));
-        a.setGrupoEscotelroId((UUID) rs.getObject("grupo_escoteiro_id"));
+        a.setGrupoEscoteiroId((UUID) rs.getObject("grupo_escoteiro_id"));
         a.setNome(rs.getString("nome"));
         a.setDescricao(rs.getString("descricao"));
         a.setStatus(rs.getString("status"));

@@ -53,6 +53,19 @@ public class DocumentoServlet extends BaseServlet {
     }
 
     @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        jsonResponse(res);
+        String id = extrairId(req);
+        if (id == null) { erro(res, 400, "ID obrigatório"); return; }
+        try {
+            Documento d = gson.fromJson(lerBody(req), Documento.class);
+            d.setId(UUID.fromString(id));
+            if (dao.atualizar(d)) ok(res, "Documento atualizado");
+            else erro(res, 404, "Documento não encontrado");
+        } catch (Exception e) { erro(res, 500, e.getMessage()); }
+    }
+
+    @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse res) throws IOException {
         jsonResponse(res);
         String id = extrairId(req);

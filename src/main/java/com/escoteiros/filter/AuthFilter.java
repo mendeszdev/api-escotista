@@ -15,7 +15,7 @@ import java.util.Set;
 @WebFilter("/api/*")
 public class AuthFilter implements Filter {
 
-    private static final Set<String> PUBLIC = Set.of("/api/auth/login");
+    private static final Set<String> PUBLIC = Set.of("/api/auth/login", "/api/auth/refresh");
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)

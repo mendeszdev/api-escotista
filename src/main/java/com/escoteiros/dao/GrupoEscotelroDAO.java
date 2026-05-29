@@ -46,8 +46,8 @@ public class GrupoEscotelroDAO {
     // ── INSERIR ─────────────────────────────────────────────────────────────
     public GrupoEscoteiro inserir(GrupoEscoteiro g) throws SQLException {
         String sql = """
-            INSERT INTO grupos_escoteiros (nome, numero, distrito, regiao, logo_url, status)
-            VALUES (?, ?, ?, ?, ?, ?::status_geral)
+            INSERT INTO grupos_escoteiros (nome, numero, distrito, regiao, paleta_cores, logo_url, status)
+            VALUES (?, ?, ?, ?, ?::jsonb, ?, ?::status_geral)
             RETURNING id, criado_em, atualizado_em
             """;
         try (Connection con = DatabaseConfig.getConnection();
@@ -56,8 +56,9 @@ public class GrupoEscotelroDAO {
             st.setString(2, g.getNumero());
             st.setString(3, g.getDistrito());
             st.setString(4, g.getRegiao());
-            st.setString(5, g.getLogoUrl());
-            st.setString(6, g.getStatus() != null ? g.getStatus() : "ativo");
+            st.setString(5, g.getPaletaCores());
+            st.setString(6, g.getLogoUrl());
+            st.setString(7, g.getStatus() != null ? g.getStatus() : "ativo");
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 g.setId((UUID) rs.getObject("id"));
@@ -73,7 +74,7 @@ public class GrupoEscotelroDAO {
         String sql = """
             UPDATE grupos_escoteiros
             SET nome = ?, numero = ?, distrito = ?, regiao = ?,
-                logo_url = ?, status = ?::status_geral
+                paleta_cores = ?::jsonb, logo_url = ?, status = ?::status_geral
             WHERE id = ?
             """;
         try (Connection con = DatabaseConfig.getConnection();
@@ -82,9 +83,10 @@ public class GrupoEscotelroDAO {
             st.setString(2, g.getNumero());
             st.setString(3, g.getDistrito());
             st.setString(4, g.getRegiao());
-            st.setString(5, g.getLogoUrl());
-            st.setString(6, g.getStatus());
-            st.setObject(7, g.getId());
+            st.setString(5, g.getPaletaCores());
+            st.setString(6, g.getLogoUrl());
+            st.setString(7, g.getStatus());
+            st.setObject(8, g.getId());
             return st.executeUpdate() > 0;
         }
     }

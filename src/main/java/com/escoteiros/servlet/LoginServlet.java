@@ -62,7 +62,7 @@ public class LoginServlet extends BaseServlet {
             String role         = mapearPerfil(associado.getPerfil());
             String accessToken  = JwtUtil.gerarAccessToken(
                 associado.getId(), associado.getMatricula(), role,
-                associado.getNomeCompleto(), associado.getGrupoEscotelroId());
+                associado.getNomeCompleto(), associado.getGrupoEscoteiroId());
             String refreshToken = JwtUtil.gerarRefreshToken(associado.getId());
 
             Map<String, Object> user = new HashMap<>();
@@ -73,8 +73,8 @@ public class LoginServlet extends BaseServlet {
             user.put("role",         role);
             user.put("email",        associado.getEmail());
             user.put("fotoUrl",      associado.getFotoUrl());
-            user.put("grupoId",      associado.getGrupoEscotelroId() != null
-                                        ? associado.getGrupoEscotelroId().toString() : null);
+            user.put("grupoId",      associado.getGrupoEscoteiroId() != null
+                                        ? associado.getGrupoEscoteiroId().toString() : null);
 
             Map<String, Object> resposta = new HashMap<>();
             resposta.put("success",      true);

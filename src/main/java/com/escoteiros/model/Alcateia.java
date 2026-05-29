@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class Alcateia {
     private UUID           id;
-    private UUID           grupoEscotelroId;
+    private UUID           grupoEscoteiroId;
     private String         nome;
     private String         descricao;
     private String         status;
@@ -15,8 +15,8 @@ public class Alcateia {
 
     public UUID getId()                            { return id; }
     public void setId(UUID id)                     { this.id = id; }
-    public UUID getGrupoEscotelroId()              { return grupoEscotelroId; }
-    public void setGrupoEscotelroId(UUID g)        { this.grupoEscotelroId = g; }
+    public UUID getGrupoEscoteiroId()              { return grupoEscoteiroId; }
+    public void setGrupoEscoteiroId(UUID g)        { this.grupoEscoteiroId = g; }
     public String getNome()                        { return nome; }
     public void setNome(String n)                  { this.nome = n; }
     public String getDescricao()                   { return descricao; }

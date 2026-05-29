@@ -105,7 +105,7 @@ public class AssociadoDAO {
             """;
         try (Connection con = DatabaseConfig.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
-            st.setObject(1,  a.getGrupoEscotelroId());
+            st.setObject(1,  a.getGrupoEscoteiroId());
             st.setString(2,  a.getMatricula());
             st.setString(3,  a.getSenhaHash()); // já deve vir com hash do controller
             st.setString(4,  a.getPerfil());
@@ -185,7 +185,7 @@ public class AssociadoDAO {
     private Associado mapear(ResultSet rs) throws SQLException {
         Associado a = new Associado();
         a.setId((UUID) rs.getObject("id"));
-        a.setGrupoEscotelroId((UUID) rs.getObject("grupo_escoteiro_id"));
+        a.setGrupoEscoteiroId((UUID) rs.getObject("grupo_escoteiro_id"));
         a.setMatricula(rs.getString("matricula"));
         a.setPerfil(rs.getString("perfil"));
         a.setNomeCompleto(rs.getString("nome_completo"));

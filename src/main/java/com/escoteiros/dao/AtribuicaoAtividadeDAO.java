@@ -66,7 +66,7 @@ public class AtribuicaoAtividadeDAO {
             INSERT INTO atribuicoes_atividade
               (atividade_id, associado_id, status, descricao_registro, midia_url)
             VALUES (?, ?, ?::atividade_status, ?, ?)
-            RETURNING id
+            RETURNING id, status, registrado_em, validado_em
             """;
         try (Connection con = DatabaseConfig.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -79,7 +79,12 @@ public class AtribuicaoAtividadeDAO {
                 a.getMidiaUrl() != null ? a.getMidiaUrl() : new String[0]);
             st.setArray(5, midiaArray);
             ResultSet rs = st.executeQuery();
-            if (rs.next()) a.setId((UUID) rs.getObject("id"));
+            if (rs.next()) {
+                a.setId((UUID) rs.getObject("id"));
+                a.setStatus(rs.getString("status"));
+                a.setRegistradoEm(rs.getObject("registrado_em", java.time.OffsetDateTime.class));
+                a.setValidadoEm(rs.getObject("validado_em", java.time.OffsetDateTime.class));
+            }
         }
         return a;
     }

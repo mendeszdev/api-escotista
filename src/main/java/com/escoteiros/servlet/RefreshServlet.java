@@ -86,7 +86,7 @@ public class RefreshServlet extends BaseServlet {
             String role            = mapearPerfil(associado.getPerfil());
             String novoAccessToken = JwtUtil.gerarAccessToken(
                 associado.getId(), associado.getMatricula(), role,
-                associado.getNomeCompleto(), associado.getGrupoEscotelroId());
+                associado.getNomeCompleto(), associado.getGrupoEscoteiroId());
             String novoRefreshToken = JwtUtil.gerarRefreshToken(associado.getId());
 
             Map<String, Object> resposta = new HashMap<>();

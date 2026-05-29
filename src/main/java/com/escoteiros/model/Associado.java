@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class Associado {
     private UUID           id;
-    private UUID           grupoEscotelroId;
+    private UUID           grupoEscoteiroId;
     private String         matricula;
     private String         senhaHash;        // NUNCA retornar em GET
     private String         perfil;           // enum perfil_tipo
@@ -36,8 +36,8 @@ public class Associado {
     public UUID getId()                            { return id; }
     public void setId(UUID id)                     { this.id = id; }
 
-    public UUID getGrupoEscotelroId()              { return grupoEscotelroId; }
-    public void setGrupoEscotelroId(UUID g)        { this.grupoEscotelroId = g; }
+    public UUID getGrupoEscoteiroId()              { return grupoEscoteiroId; }
+    public void setGrupoEscoteiroId(UUID g)        { this.grupoEscoteiroId = g; }
 
     public String getMatricula()                   { return matricula; }
     public void setMatricula(String m)             { this.matricula = m; }

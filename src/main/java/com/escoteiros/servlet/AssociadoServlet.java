@@ -9,6 +9,7 @@ import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -58,9 +59,11 @@ public class AssociadoServlet extends BaseServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         jsonResponse(res);
         try {
-            Associado a = gson.fromJson(lerBody(req), Associado.class);
-            if (a.getSenhaHash() != null && !a.getSenhaHash().isBlank()) {
-                a.setSenhaHash(PasswordUtil.hash(a.getSenhaHash()));
+            Map<?, ?> body = gson.fromJson(lerBody(req), Map.class);
+            Associado a = gson.fromJson(gson.toJson(body), Associado.class);
+            String senhaPlana = (String) body.get("senha");
+            if (senhaPlana != null && !senhaPlana.isBlank()) {
+                a.setSenhaHash(PasswordUtil.hash(senhaPlana));
             }
             Associado criado = dao.inserir(a);
             res.setStatus(201);

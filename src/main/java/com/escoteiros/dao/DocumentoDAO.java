@@ -50,6 +50,18 @@ public class DocumentoDAO {
         return d;
     }
 
+    public boolean atualizar(Documento d) throws SQLException {
+        String sql = "UPDATE documentos SET status = ?::status_geral, validade = ?, obrigatorio = ? WHERE id = ?";
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, d.getStatus());
+            st.setObject(2, d.getValidade());
+            st.setBoolean(3, d.isObrigatorio());
+            st.setObject(4, d.getId());
+            return st.executeUpdate() > 0;
+        }
+    }
+
     public boolean deletar(UUID id) throws SQLException {
         try (Connection con = DatabaseConfig.getConnection();
              PreparedStatement st = con.prepareStatement("DELETE FROM documentos WHERE id=?")) {
