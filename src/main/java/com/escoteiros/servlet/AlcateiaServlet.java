@@ -31,10 +31,8 @@ public class AlcateiaServlet extends BaseServlet {
         try {
             if (id == null) {
                 String grupoParam = req.getParameter("grupo");
-                List<Alcateia> lista = grupoParam != null
-                    ? dao.listarPorGrupo(UUID.fromString(grupoParam))
-                    : dao.listarTodos();
-                res.getWriter().print(gson.toJson(lista));
+                UUID grupoId = grupoParam != null ? UUID.fromString(grupoParam) : null;
+                res.getWriter().print(gson.toJson(dao.listarComStats(grupoId)));
             } else {
                 Alcateia a = dao.buscarPorId(UUID.fromString(id));
                 if (a != null) res.getWriter().print(gson.toJson(a));

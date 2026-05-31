@@ -171,6 +171,36 @@ public class AssociadoDAO {
         }
     }
 
+    // ── PRÓXIMA MATRÍCULA ────────────────────────────────────────────────────
+    public String proximaMatricula(String perfil) throws SQLException {
+        String prefix = switch (perfil.toLowerCase()) {
+            case "lobinho"   -> "LB";
+            case "escotista" -> "ES";
+            case "dirigente" -> "DG";
+            default          -> "MB";
+        };
+        String year = String.valueOf(java.time.LocalDate.now().getYear());
+        String sql = """
+            SELECT matricula FROM associados
+            WHERE perfil = ?::perfil_tipo
+              AND matricula LIKE ?
+            ORDER BY matricula DESC
+            LIMIT 1
+            """;
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, perfil);
+            st.setString(2, prefix + "." + year + "-%");
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                String last = rs.getString("matricula");
+                int num = Integer.parseInt(last.substring(last.lastIndexOf('-') + 1)) + 1;
+                return String.format("%s.%s-%03d", prefix, year, num);
+            }
+        }
+        return String.format("%s.%s-001", prefix, year);
+    }
+
     // ── DELETAR ─────────────────────────────────────────────────────────────
     public boolean deletar(UUID id) throws SQLException {
         String sql = "DELETE FROM associados WHERE id = ?";

@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import jakarta.servlet.http.*;
 
 import java.io.*;
+import java.util.Map;
 
 /**
  * Servlet base com helpers para:
@@ -44,17 +45,17 @@ public abstract class BaseServlet extends HttpServlet {
         return path.substring(1);  // remove a barra inicial
     }
 
-    /** Envia JSON de erro padronizado */
+    /** Envia JSON de erro padronizado — usa Gson para escapar corretamente */
     protected void erro(HttpServletResponse res, int status, String mensagem)
             throws IOException {
         res.setStatus(status);
         res.setContentType("application/json;charset=UTF-8");
-        res.getWriter().print("{\"erro\":\"" + mensagem + "\"}");
+        res.getWriter().print(gson.toJson(Map.of("erro", mensagem != null ? mensagem : "Erro interno")));
     }
 
-    /** Envia JSON de sucesso simples */
+    /** Envia JSON de sucesso simples — usa Gson para escapar corretamente */
     protected void ok(HttpServletResponse res, String mensagem) throws IOException {
         res.setContentType("application/json;charset=UTF-8");
-        res.getWriter().print("{\"mensagem\":\"" + mensagem + "\"}");
+        res.getWriter().print(gson.toJson(Map.of("mensagem", mensagem != null ? mensagem : "OK")));
     }
 }

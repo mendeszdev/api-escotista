@@ -1,6 +1,6 @@
 package com.escoteiros.filter;
 
-import com.escoteiros.util.TokenStore;
+import com.escoteiros.util.JwtUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.*;
@@ -38,7 +38,7 @@ public class AuthFilter implements Filter {
         }
 
         String token = authHeader.substring(7).trim();
-        if (!TokenStore.isValid(token)) {
+        if (!JwtUtil.isValido(token)) {
             unauthorized(response, "Token inválido ou expirado");
             return;
         }

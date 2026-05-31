@@ -32,7 +32,15 @@ public class AssociadoServlet extends BaseServlet {
         jsonResponse(res);
         String id = extrairId(req);
         try {
-            if (id == null) {
+            if ("proxima-matricula".equals(id)) {
+                String perfil = req.getParameter("perfil");
+                if (perfil == null || perfil.isBlank()) {
+                    erro(res, 400, "Parâmetro 'perfil' obrigatório");
+                    return;
+                }
+                String matricula = dao.proximaMatricula(perfil);
+                res.getWriter().print("{\"matricula\":\"" + matricula + "\"}");
+            } else if (id == null) {
                 String grupoParam  = req.getParameter("grupo");
                 String perfilParam = req.getParameter("perfil");
 

@@ -90,11 +90,16 @@ public class AtribuicaoAtividadeDAO {
     }
 
     public boolean atualizar(AtribuicaoAtividade a) throws SQLException {
+        // COALESCE mantém o valor atual do banco quando o campo não é enviado (null)
         String sql = """
             UPDATE atribuicoes_atividade SET
-              status = ?::atividade_status, registrado_em = ?,
-              descricao_registro = ?, midia_url = ?,
-              validado_por = ?, validado_em = ?, feedback = ?
+              status         = COALESCE(?::atividade_status, status),
+              registrado_em  = COALESCE(?, registrado_em),
+              descricao_registro = COALESCE(?, descricao_registro),
+              midia_url      = COALESCE(?, midia_url),
+              validado_por   = COALESCE(?, validado_por),
+              validado_em    = COALESCE(?, validado_em),
+              feedback       = COALESCE(?, feedback)
             WHERE id = ?
             """;
         try (Connection con = DatabaseConfig.getConnection();
@@ -102,8 +107,8 @@ public class AtribuicaoAtividadeDAO {
             st.setString(1, a.getStatus());
             st.setObject(2, a.getRegistradoEm());
             st.setString(3, a.getDescricaoRegistro());
-            Array midiaArray = con.createArrayOf("text",
-                a.getMidiaUrl() != null ? a.getMidiaUrl() : new String[0]);
+            Array midiaArray = a.getMidiaUrl() != null && a.getMidiaUrl().length > 0
+                ? con.createArrayOf("text", a.getMidiaUrl()) : null;
             st.setArray(4, midiaArray);
             st.setObject(5, a.getValidadoPor());
             st.setObject(6, a.getValidadoEm());
