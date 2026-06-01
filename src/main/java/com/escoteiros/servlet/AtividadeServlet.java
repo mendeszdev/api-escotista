@@ -31,9 +31,15 @@ public class AtividadeServlet extends BaseServlet {
         try {
             if (id == null) {
                 String alcateiaParam = req.getParameter("alcateia");
-                List<Atividade> lista = alcateiaParam != null
-                    ? dao.listarPorAlcateia(UUID.fromString(alcateiaParam))
-                    : dao.listarTodos();
+                String blocoParam    = req.getParameter("bloco");
+                List<Atividade> lista;
+                if (alcateiaParam != null) {
+                    lista = dao.listarPorAlcateia(UUID.fromString(alcateiaParam));
+                } else if (blocoParam != null) {
+                    lista = dao.listarPorBloco(UUID.fromString(blocoParam));
+                } else {
+                    lista = dao.listarTodos();
+                }
                 res.getWriter().print(gson.toJson(lista));
             } else {
                 Atividade a = dao.buscarPorId(UUID.fromString(id));

@@ -66,6 +66,15 @@
     </dependency>
 
     <!-- ═══════════════════════════════════════════
+         OpenPDF — geração de relatórios em PDF (fork LGPL do iText 5)
+         ═══════════════════════════════════════════ -->
+    <dependency>
+      <groupId>com.github.librepdf</groupId>
+      <artifactId>openpdf</artifactId>
+      <version>1.3.43</version>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════
          JWT — geração e validação de tokens
          ═══════════════════════════════════════════ -->
     <dependency>

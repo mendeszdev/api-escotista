@@ -8,10 +8,6 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Set;
 
-/**
- * Valida o Bearer token em todas as rotas /api/* exceto as públicas.
- * Deve rodar após o CorsFilter — declarar ordem em web.xml se necessário.
- */
 @WebFilter("/api/*")
 public class AuthFilter implements Filter {
 
@@ -24,9 +20,18 @@ public class AuthFilter implements Filter {
         HttpServletRequest  request  = (HttpServletRequest)  req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        // OPTIONS já tratado pelo CorsFilter; rotas públicas passam direto
+        // Responde OPTIONS diretamente com CORS headers, sem depender do CorsFilter.
+        // Garante que o preflight funcione independente da ordem dos filtros.
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setHeader("Access-Control-Allow-Origin",  "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         String path = request.getRequestURI().substring(request.getContextPath().length());
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod()) || PUBLIC.contains(path)) {
+        if (PUBLIC.contains(path)) {
             chain.doFilter(req, res);
             return;
         }

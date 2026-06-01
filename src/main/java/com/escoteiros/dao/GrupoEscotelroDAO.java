@@ -73,8 +73,13 @@ public class GrupoEscotelroDAO {
     public boolean atualizar(GrupoEscoteiro g) throws SQLException {
         String sql = """
             UPDATE grupos_escoteiros
-            SET nome = ?, numero = ?, distrito = ?, regiao = ?,
-                paleta_cores = ?::jsonb, logo_url = ?, status = ?::status_geral
+            SET nome         = COALESCE(?, nome),
+                numero       = COALESCE(?, numero),
+                distrito     = COALESCE(?, distrito),
+                regiao       = COALESCE(?, regiao),
+                paleta_cores = COALESCE(?::jsonb, paleta_cores),
+                logo_url     = COALESCE(?, logo_url),
+                status       = COALESCE(?::status_geral, status)
             WHERE id = ?
             """;
         try (Connection con = DatabaseConfig.getConnection();

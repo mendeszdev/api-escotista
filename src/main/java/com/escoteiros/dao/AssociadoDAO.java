@@ -144,6 +144,7 @@ public class AssociadoDAO {
         String sql = """
             UPDATE associados SET
               nome_completo = ?, nome_escoteiro = ?, genero = ?, estado_civil = ?,
+              cpf = ?, rg = ?, passaporte = ?,
               email = ?, telefone = ?, cep = ?, logradouro = ?, numero_end = ?,
               bairro = ?, cidade = ?, estado = ?, foto_url = ?,
               status = ?::status_geral, documentos_validados = ?
@@ -155,18 +156,21 @@ public class AssociadoDAO {
             st.setString(2,  a.getNomeEscoteiro());
             st.setString(3,  a.getGenero());
             st.setString(4,  a.getEstadoCivil());
-            st.setString(5,  a.getEmail());
-            st.setString(6,  a.getTelefone());
-            st.setString(7,  a.getCep());
-            st.setString(8,  a.getLogradouro());
-            st.setString(9,  a.getNumeroEnd());
-            st.setString(10, a.getBairro());
-            st.setString(11, a.getCidade());
-            st.setString(12, a.getEstado());
-            st.setString(13, a.getFotoUrl());
-            st.setString(14, a.getStatus());
-            st.setBoolean(15, a.isDocumentosValidados());
-            st.setObject(16, a.getId());
+            st.setString(5,  a.getCpf());
+            st.setString(6,  a.getRg());
+            st.setString(7,  a.getPassaporte());
+            st.setString(8,  a.getEmail());
+            st.setString(9,  a.getTelefone());
+            st.setString(10, a.getCep());
+            st.setString(11, a.getLogradouro());
+            st.setString(12, a.getNumeroEnd());
+            st.setString(13, a.getBairro());
+            st.setString(14, a.getCidade());
+            st.setString(15, a.getEstado());
+            st.setString(16, a.getFotoUrl());
+            st.setString(17, a.getStatus());
+            st.setBoolean(18, a.isDocumentosValidados());
+            st.setObject(19, a.getId());
             return st.executeUpdate() > 0;
         }
     }

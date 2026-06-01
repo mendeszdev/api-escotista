@@ -39,6 +39,26 @@ public class AtividadeDAO {
         return lista;
     }
 
+    public List<Atividade> listarPorBloco(UUID blocoId) throws SQLException {
+        List<Atividade> lista = new ArrayList<>();
+        String sql = """
+            SELECT a.id, a.acao_educativa_id, a.criado_por, a.alcateia_id,
+                   a.e_personalizada, a.nome_personalizado, a.descricao_personalizada,
+                   a.aprovada_por, a.data_limite, a.criado_em, a.atualizado_em
+            FROM atividades a
+            JOIN acoes_educativas ae ON a.acao_educativa_id = ae.id
+            WHERE ae.bloco_id = ?
+            ORDER BY a.criado_em DESC
+            """;
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setObject(1, blocoId);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) lista.add(mapear(rs));
+        }
+        return lista;
+    }
+
     public Atividade buscarPorId(UUID id) throws SQLException {
         String sql = "SELECT " + COLS + " FROM atividades WHERE id = ?";
         try (Connection con = DatabaseConfig.getConnection();

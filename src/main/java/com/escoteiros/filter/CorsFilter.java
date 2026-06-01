@@ -6,10 +6,6 @@ import jakarta.servlet.http.*;
 
 import java.io.IOException;
 
-/**
- * Filtro global que adiciona cabeçalhos CORS a todas as respostas.
- * Necessário para que o front-end (React, etc.) consiga chamar a API.
- */
 @WebFilter("/*")
 public class CorsFilter implements Filter {
 
