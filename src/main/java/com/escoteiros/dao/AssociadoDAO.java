@@ -177,32 +177,47 @@ public class AssociadoDAO {
 
     // ── PRÓXIMA MATRÍCULA ────────────────────────────────────────────────────
     public String proximaMatricula(String perfil) throws SQLException {
-        String prefix = switch (perfil.toLowerCase()) {
-            case "lobinho"   -> "LB";
-            case "escotista" -> "ES";
-            case "dirigente" -> "DG";
-            default          -> "MB";
-        };
-        String year = String.valueOf(java.time.LocalDate.now().getYear());
         String sql = """
             SELECT matricula FROM associados
-            WHERE perfil = ?::perfil_tipo
-              AND matricula LIKE ?
-            ORDER BY matricula DESC
+            WHERE matricula ~ '^[0-9]+$'
+            ORDER BY LENGTH(matricula) DESC, matricula DESC
             LIMIT 1
             """;
         try (Connection con = DatabaseConfig.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
-            st.setString(1, perfil);
-            st.setString(2, prefix + "." + year + "-%");
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                String last = rs.getString("matricula");
-                int num = Integer.parseInt(last.substring(last.lastIndexOf('-') + 1)) + 1;
-                return String.format("%s.%s-%03d", prefix, year, num);
+                long num = Long.parseLong(rs.getString("matricula")) + 1;
+                return String.format("%06d", num);
             }
         }
-        return String.format("%s.%s-001", prefix, year);
+        return "000001";
+    }
+
+    // ── RECUPERAÇÃO DE SENHA ────────────────────────────────────────────────
+    public boolean verificarIdentidade(String matricula, String cpf) throws SQLException {
+        String cpfDigits = cpf.replaceAll("[^0-9]", "");
+        String sql = "SELECT cpf FROM associados WHERE matricula = ? AND status = 'ativo'";
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, matricula);
+            ResultSet rs = st.executeQuery();
+            if (!rs.next()) return false;
+            String cpfSalvo = rs.getString("cpf");
+            if (cpfSalvo == null || cpfSalvo.isBlank()) return false;
+            return cpfSalvo.replaceAll("[^0-9]", "").equals(cpfDigits);
+        }
+    }
+
+    public boolean redefinirSenha(String matricula, String cpf, String novaSenha) throws SQLException {
+        if (!verificarIdentidade(matricula, cpf)) return false;
+        String sql = "UPDATE associados SET senha_hash = ? WHERE matricula = ? AND status = 'ativo'";
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, PasswordUtil.hash(novaSenha));
+            st.setString(2, matricula);
+            return st.executeUpdate() > 0;
+        }
     }
 
     // ── DELETAR ─────────────────────────────────────────────────────────────

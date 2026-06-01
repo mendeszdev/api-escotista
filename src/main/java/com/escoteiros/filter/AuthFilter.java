@@ -11,7 +11,11 @@ import java.util.Set;
 @WebFilter("/api/*")
 public class AuthFilter implements Filter {
 
-    private static final Set<String> PUBLIC = Set.of("/api/auth/login", "/api/auth/refresh");
+    private static final Set<String> PUBLIC = Set.of(
+        "/api/auth/login",
+        "/api/auth/refresh",
+        "/api/auth/recuperar-senha"
+    );
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
