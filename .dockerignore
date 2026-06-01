@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.env.*
+target/
+*.class
+.smarttomcat/
+README.md
+*.sql
+CT.java
+CT.class

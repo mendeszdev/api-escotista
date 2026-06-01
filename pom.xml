@@ -98,6 +98,9 @@
   </dependencies>
 
   <build>
+    <!-- Nome fixo do WAR — evita sufixo de versão no arquivo gerado -->
+    <finalName>escoteiros-api</finalName>
+
     <!--
       SmartTomcat aponta docBase para src/main/webapp e busca classes
       em WEB-INF/classes dentro desse diretório. Redirecionar o output
