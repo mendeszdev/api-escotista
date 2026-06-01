@@ -12,8 +12,10 @@ public class DatabaseConfig {
     private static final String USER     = prop("DB_USER", "postgres");
     private static final String PASSWORD = prop("DB_PASS", "");
 
+    private static final String SSL  = prop("DB_SSL", "require");
+
     private static final String URL = String.format(
-        "jdbc:postgresql://%s:%s/%s?sslmode=require", HOST, PORT, DATABASE
+        "jdbc:postgresql://%s:%s/%s?sslmode=%s", HOST, PORT, DATABASE, SSL
     );
 
     public static Connection getConnection() throws SQLException {
