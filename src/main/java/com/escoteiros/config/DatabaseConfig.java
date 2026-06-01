@@ -12,11 +12,22 @@ public class DatabaseConfig {
     private static final String USER     = prop("DB_USER", "postgres");
     private static final String PASSWORD = prop("DB_PASS", "");
 
-    private static final String SSL  = prop("DB_SSL", "require");
+    private static final String SSL     = prop("DB_SSL", "require");
+    private static final String PROJECT = prop("DB_PROJECT", "");
 
-    private static final String URL = String.format(
-        "jdbc:postgresql://%s:%s/%s?sslmode=%s", HOST, PORT, DATABASE, SSL
-    );
+    private static final String URL = buildUrl();
+
+    private static String buildUrl() {
+        String base = String.format(
+            "jdbc:postgresql://%s:%s/%s?sslmode=%s", HOST, PORT, DATABASE, SSL
+        );
+        // Passa o project ref via options para o pooler do Supabase identificar o tenant
+        // sem depender de SNI (necessário para conexões Java/JDBC via Supavisor)
+        if (PROJECT != null && !PROJECT.isBlank()) {
+            base += "&options=project%3D" + PROJECT;
+        }
+        return base;
+    }
 
     public static Connection getConnection() throws SQLException {
         try {
