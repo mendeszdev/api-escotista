@@ -70,14 +70,15 @@ public class MatilhaDAO {
     }
 
     public boolean atualizar(Matilha m) throws SQLException {
-        String sql = "UPDATE matilhas SET nome = ?, cor = ?, icone_url = ?, status = ?::status_geral WHERE id = ?";
+        String sql = "UPDATE matilhas SET alcateia_id = ?, nome = ?, cor = ?, icone_url = ?, status = ?::status_geral WHERE id = ?";
         try (Connection con = DatabaseConfig.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
-            st.setString(1, m.getNome());
-            st.setString(2, m.getCor());
-            st.setString(3, m.getIconeUrl());
-            st.setString(4, m.getStatus());
-            st.setObject(5, m.getId());
+            st.setObject(1, m.getAlcateiaId());
+            st.setString(2, m.getNome());
+            st.setString(3, m.getCor());
+            st.setString(4, m.getIconeUrl());
+            st.setString(5, m.getStatus());
+            st.setObject(6, m.getId());
             return st.executeUpdate() > 0;
         }
     }
