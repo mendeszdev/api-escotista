@@ -98,14 +98,23 @@
   </dependencies>
 
   <build>
+    <!--
+      SmartTomcat aponta docBase para src/main/webapp e busca classes
+      em WEB-INF/classes dentro desse diretório. Redirecionar o output
+      do compilador para lá faz o hot-reload funcionar sem configuração
+      extra no contexto do Tomcat.
+    -->
+    <outputDirectory>${project.basedir}/src/main/webapp/WEB-INF/classes</outputDirectory>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.4.0</version>
         <configuration>
-          <!-- Permite build sem web.xml (usamos @WebServlet) -->
           <failOnMissingWebXml>false</failOnMissingWebXml>
+          <!-- classes já estão dentro de warSourceDirectory; evita duplicação no WAR -->
+          <useCache>false</useCache>
         </configuration>
       </plugin>
     </plugins>

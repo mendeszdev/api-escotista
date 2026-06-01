@@ -15,6 +15,9 @@ public class AtribuicaoDetalhadaDAO {
             aa.id, aa.atividade_id, aa.associado_id, aa.status,
             aa.registrado_em, aa.descricao_registro, aa.midia_url,
             aa.validado_por, aa.validado_em, aa.feedback,
+            aa.data_realizacao,
+            ae.id                AS acao_educativa_id,
+            ae.tipo::text        AS acao_tipo,
             asc_.nome_completo   AS associado_nome,
             COALESCE(at.nome_personalizado, ae.nome) AS atividade_nome,
             ba.nome              AS bloco_nome,
@@ -67,6 +70,10 @@ public class AtribuicaoDetalhadaDAO {
         a.setValidadoPor((UUID) rs.getObject("validado_por"));
         a.setValidadoEm(rs.getObject("validado_em", java.time.OffsetDateTime.class));
         a.setFeedback(rs.getString("feedback"));
+        Date drz = rs.getDate("data_realizacao");
+        if (drz != null) a.setDataRealizacao(drz.toLocalDate());
+        a.setAcaoEducativaId((UUID) rs.getObject("acao_educativa_id"));
+        a.setAcaoTipo(rs.getString("acao_tipo"));
         a.setAssociadoNome(rs.getString("associado_nome"));
         a.setAtividadeNome(rs.getString("atividade_nome"));
         a.setBlocoNome(rs.getString("bloco_nome"));

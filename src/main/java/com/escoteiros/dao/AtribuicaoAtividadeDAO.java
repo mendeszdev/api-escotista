@@ -12,7 +12,8 @@ public class AtribuicaoAtividadeDAO {
 
     private static final String COLS = """
         id, atividade_id, associado_id, status, registrado_em,
-        descricao_registro, midia_url, validado_por, validado_em, feedback
+        descricao_registro, midia_url, validado_por, validado_em, feedback,
+        data_realizacao
         """;
 
     public List<AtribuicaoAtividade> listarTodos() throws SQLException {
@@ -64,8 +65,8 @@ public class AtribuicaoAtividadeDAO {
     public AtribuicaoAtividade inserir(AtribuicaoAtividade a) throws SQLException {
         String sql = """
             INSERT INTO atribuicoes_atividade
-              (atividade_id, associado_id, status, descricao_registro, midia_url)
-            VALUES (?, ?, ?::atividade_status, ?, ?)
+              (atividade_id, associado_id, status, descricao_registro, midia_url, data_realizacao)
+            VALUES (?, ?, ?::atividade_status, ?, ?, ?)
             RETURNING id, status, registrado_em, validado_em
             """;
         try (Connection con = DatabaseConfig.getConnection();
@@ -74,10 +75,10 @@ public class AtribuicaoAtividadeDAO {
             st.setObject(2, a.getAssociadoId());
             st.setString(3, a.getStatus() != null ? a.getStatus() : "pendente");
             st.setString(4, a.getDescricaoRegistro());
-            // Converter String[] para Array do PostgreSQL
             Array midiaArray = con.createArrayOf("text",
                 a.getMidiaUrl() != null ? a.getMidiaUrl() : new String[0]);
             st.setArray(5, midiaArray);
+            st.setObject(6, a.getDataRealizacao());
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 a.setId((UUID) rs.getObject("id"));
@@ -89,17 +90,33 @@ public class AtribuicaoAtividadeDAO {
         return a;
     }
 
+    public AtribuicaoAtividade buscarAtivaPorAtividadeEAssociado(UUID atividadeId, UUID associadoId)
+            throws SQLException {
+        String sql = "SELECT " + COLS +
+            " FROM atribuicoes_atividade WHERE atividade_id = ? AND associado_id = ?" +
+            " ORDER BY registrado_em DESC LIMIT 1";
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setObject(1, atividadeId);
+            st.setObject(2, associadoId);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) return mapear(rs);
+        }
+        return null;
+    }
+
     public boolean atualizar(AtribuicaoAtividade a) throws SQLException {
         // COALESCE mantém o valor atual do banco quando o campo não é enviado (null)
         String sql = """
             UPDATE atribuicoes_atividade SET
-              status         = COALESCE(?::atividade_status, status),
-              registrado_em  = COALESCE(?, registrado_em),
+              status             = COALESCE(?::atividade_status, status),
+              registrado_em      = COALESCE(?, registrado_em),
               descricao_registro = COALESCE(?, descricao_registro),
-              midia_url      = COALESCE(?, midia_url),
-              validado_por   = COALESCE(?, validado_por),
-              validado_em    = COALESCE(?, validado_em),
-              feedback       = COALESCE(?, feedback)
+              midia_url          = COALESCE(?, midia_url),
+              validado_por       = COALESCE(?, validado_por),
+              validado_em        = COALESCE(?, validado_em),
+              feedback           = COALESCE(?, feedback),
+              data_realizacao    = COALESCE(?, data_realizacao)
             WHERE id = ?
             """;
         try (Connection con = DatabaseConfig.getConnection();
@@ -113,7 +130,8 @@ public class AtribuicaoAtividadeDAO {
             st.setObject(5, a.getValidadoPor());
             st.setObject(6, a.getValidadoEm());
             st.setString(7, a.getFeedback());
-            st.setObject(8, a.getId());
+            st.setObject(8, a.getDataRealizacao());
+            st.setObject(9, a.getId());
             return st.executeUpdate() > 0;
         }
     }
@@ -141,6 +159,8 @@ public class AtribuicaoAtividadeDAO {
         a.setValidadoPor((UUID) rs.getObject("validado_por"));
         a.setValidadoEm(rs.getObject("validado_em", java.time.OffsetDateTime.class));
         a.setFeedback(rs.getString("feedback"));
+        Date dr = rs.getDate("data_realizacao");
+        if (dr != null) a.setDataRealizacao(dr.toLocalDate());
         return a;
     }
 }

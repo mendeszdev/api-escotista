@@ -117,6 +117,25 @@ public class AtividadeDAO {
         }
     }
 
+    public Atividade buscarOuCriarParaAcao(UUID acaoId, UUID alcateiaId, UUID criadoPor)
+            throws SQLException {
+        String find = "SELECT " + COLS +
+            " FROM atividades WHERE acao_educativa_id = ? AND alcateia_id = ? LIMIT 1";
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement st = con.prepareStatement(find)) {
+            st.setObject(1, acaoId);
+            st.setObject(2, alcateiaId);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) return mapear(rs);
+        }
+        Atividade nova = new Atividade();
+        nova.setAcaoEducativaId(acaoId);
+        nova.setAlcateiaId(alcateiaId);
+        nova.setCriadoPor(criadoPor);
+        nova.setEPersonalizada(false);
+        return inserir(nova);
+    }
+
     public boolean deletar(UUID id) throws SQLException {
         String sql = "DELETE FROM atividades WHERE id = ?";
         try (Connection con = DatabaseConfig.getConnection();

@@ -17,6 +17,10 @@ public class AtribuicaoDetalhada {
     private OffsetDateTime validadoEm;
     private String         feedback;
 
+    private LocalDate      dataRealizacao;
+    private UUID           acaoEducativaId;
+    private String         acaoTipo;
+
     // Campos joinados
     private String         associadoNome;
     private String         atividadeNome;
@@ -59,6 +63,12 @@ public class AtribuicaoDetalhada {
     public void setEixoNome(String n)                { this.eixoNome = n; }
     public UUID getEixoId()                          { return eixoId; }
     public void setEixoId(UUID id)                   { this.eixoId = id; }
+    public LocalDate getDataRealizacao()             { return dataRealizacao; }
+    public void setDataRealizacao(LocalDate d)       { this.dataRealizacao = d; }
     public LocalDate getDataLimite()                 { return dataLimite; }
     public void setDataLimite(LocalDate d)           { this.dataLimite = d; }
+    public UUID getAcaoEducativaId()                 { return acaoEducativaId; }
+    public void setAcaoEducativaId(UUID a)           { this.acaoEducativaId = a; }
+    public String getAcaoTipo()                      { return acaoTipo; }
+    public void setAcaoTipo(String t)                { this.acaoTipo = t; }
 }

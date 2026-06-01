@@ -11,7 +11,7 @@ import java.util.UUID;
 public class BlocoAprendizagemDAO {
 
     private static final String COLS =
-        "id, eixo_id, nome, descricao, min_acoes_variaveis, ordem, ativo";
+        "id, eixo_id, nome, descricao, intencionalidade, min_acoes_variaveis, ordem, ativo";
 
     public List<BlocoAprendizagem> listarTodos() throws SQLException {
         List<BlocoAprendizagem> lista = new ArrayList<>();
@@ -49,8 +49,8 @@ public class BlocoAprendizagemDAO {
 
     public BlocoAprendizagem inserir(BlocoAprendizagem b) throws SQLException {
         String sql = """
-            INSERT INTO blocos_aprendizagem (eixo_id, nome, descricao, min_acoes_variaveis, ordem, ativo)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO blocos_aprendizagem (eixo_id, nome, descricao, intencionalidade, min_acoes_variaveis, ordem, ativo)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             RETURNING id
             """;
         try (Connection con = DatabaseConfig.getConnection();
@@ -58,9 +58,10 @@ public class BlocoAprendizagemDAO {
             st.setObject(1, b.getEixoId());
             st.setString(2, b.getNome());
             st.setString(3, b.getDescricao());
-            st.setInt(4, b.getMinAcoesVariaveis());
-            st.setInt(5, b.getOrdem());
-            st.setBoolean(6, b.isAtivo());
+            st.setString(4, b.getIntencionalidade());
+            st.setInt(5, b.getMinAcoesVariaveis());
+            st.setInt(6, b.getOrdem());
+            st.setBoolean(7, b.isAtivo());
             ResultSet rs = st.executeQuery();
             if (rs.next()) b.setId((UUID) rs.getObject("id"));
         }
@@ -70,17 +71,18 @@ public class BlocoAprendizagemDAO {
     public boolean atualizar(BlocoAprendizagem b) throws SQLException {
         String sql = """
             UPDATE blocos_aprendizagem
-            SET nome = ?, descricao = ?, min_acoes_variaveis = ?, ordem = ?, ativo = ?
+            SET nome = ?, descricao = ?, intencionalidade = ?, min_acoes_variaveis = ?, ordem = ?, ativo = ?
             WHERE id = ?
             """;
         try (Connection con = DatabaseConfig.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
             st.setString(1, b.getNome());
             st.setString(2, b.getDescricao());
-            st.setInt(3, b.getMinAcoesVariaveis());
-            st.setInt(4, b.getOrdem());
-            st.setBoolean(5, b.isAtivo());
-            st.setObject(6, b.getId());
+            st.setString(3, b.getIntencionalidade());
+            st.setInt(4, b.getMinAcoesVariaveis());
+            st.setInt(5, b.getOrdem());
+            st.setBoolean(6, b.isAtivo());
+            st.setObject(7, b.getId());
             return st.executeUpdate() > 0;
         }
     }
@@ -100,6 +102,7 @@ public class BlocoAprendizagemDAO {
         b.setEixoId((UUID) rs.getObject("eixo_id"));
         b.setNome(rs.getString("nome"));
         b.setDescricao(rs.getString("descricao"));
+        b.setIntencionalidade(rs.getString("intencionalidade"));
         b.setMinAcoesVariaveis(rs.getInt("min_acoes_variaveis"));
         b.setOrdem(rs.getInt("ordem"));
         b.setAtivo(rs.getBoolean("ativo"));

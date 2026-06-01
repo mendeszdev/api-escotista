@@ -8,6 +8,9 @@ src/main/resources/.env
 # MAVEN — arquivos gerados pelo build
 # ─────────────────────────────────────────────────────────────
 target/
+# Classes e libs copiadas para SmartTomcat (outputDirectory no pom.xml)
+src/main/webapp/WEB-INF/classes/
+src/main/webapp/WEB-INF/lib/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

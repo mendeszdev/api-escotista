@@ -1,5 +1,6 @@
 package com.escoteiros.model;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ public class AtribuicaoAtividade {
     private UUID           validadoPor;
     private OffsetDateTime validadoEm;
     private String         feedback;
+    private LocalDate      dataRealizacao;   // quando o lobinho realizou (distinto de registradoEm)
 
     public UUID getId()                              { return id; }
     public void setId(UUID id)                       { this.id = id; }
@@ -35,4 +37,6 @@ public class AtribuicaoAtividade {
     public void setValidadoEm(OffsetDateTime t)      { this.validadoEm = t; }
     public String getFeedback()                      { return feedback; }
     public void setFeedback(String f)                { this.feedback = f; }
+    public LocalDate getDataRealizacao()             { return dataRealizacao; }
+    public void setDataRealizacao(LocalDate d)       { this.dataRealizacao = d; }
 }
