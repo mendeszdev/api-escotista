@@ -17,6 +17,10 @@ public class AuthFilter implements Filter {
         "/api/auth/recuperar-senha"
     );
 
+    // Prefixos de path que não exigem autenticação em GET
+    // (arquivos servidos diretamente no navegador via <img src=> ou links)
+    private static final String FILES_PREFIX = "/api/files/";
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
@@ -35,7 +39,14 @@ public class AuthFilter implements Filter {
         }
 
         String path = request.getRequestURI().substring(request.getContextPath().length());
+
         if (PUBLIC.contains(path)) {
+            chain.doFilter(req, res);
+            return;
+        }
+
+        // Arquivos públicos — GET sem token (img src, download links)
+        if ("GET".equalsIgnoreCase(request.getMethod()) && path.startsWith(FILES_PREFIX)) {
             chain.doFilter(req, res);
             return;
         }
