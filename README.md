@@ -29,8 +29,8 @@ cp .env.example .env
 ```
 Abra o `.env` e preencha com suas credenciais do Supabase:
 ```env
-DB_HOST=zatupnilwsnoqfmlqzte.supabase.co
-DB_PORT=5432
+DB_HOST=SEU-HOST
+DB_PORT=PORTA-DO-BANCO
 DB_NAME=postgres
 DB_USER=postgres
 DB_PASS=sua-senha-aqui
